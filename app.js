@@ -1,0 +1,246 @@
+// // 
+
+// const express = require("express");
+// const bodyParser = require("body-parser");
+// const request = require("request");
+// const https = require("https");
+// const app = express();
+
+
+// app.use(express.static("public"));
+// app.use(bodyParser.urlencoded({ extended: true }));
+
+
+// mailchimp.setConfig({
+//     apiKey: "c93cc1320388406941504ca9450d080c-us21",
+//     server:"us21"
+// })
+
+
+// app.get("/", function (req, res) {
+//     res.sendFile(__dirname + "/signup.html")
+// })
+
+// app.post("/", function (req, res) {
+//     const Fname = req.body.Fname;
+//     const Lname = req.body.Lname;
+//     const email = req.body.Email;
+
+//     const listID="06395cf51a";
+
+//     async function addMember(){
+//         const response = await mailchimp.lists.addListMember(listID,{
+
+//             email_address: email,
+//             status: "subscribed",
+//             merge_fields: {
+//                 FNAME: Fname,
+//                 LNAME: Lname,
+//                 email: email
+//             }
+//         });
+//         console.log(
+//             `Successfully added as an audience member. The contact id is ${response.id}`
+//             );
+//     }
+//     addMember();
+
+
+// //     const data = {
+// //         members: [
+// //             {
+// //                 email_address: email,
+// //                 status: "subscribed",
+// //                 merge_fields: {
+// //                     FNAME: Fname,
+// //                     LNAME: Lname,
+// //                     email: email
+// //                 }
+// //             }
+// //         ]
+// //     };
+
+// //     const jsonData = JSON.stringify(data);//converting the above data to a json type file 
+
+// //     const url = "https://us21.api.mailchimp.com/3.0/lists/06395cf51a";
+
+
+// //     const options = {
+// //         mathod: "POST",
+// //         auth: "abhi-coder722:c93cc1320388406941504ca9450d080c-us21"//random name:api key
+// //     }
+
+// //     const request = https.request(url, options, function (response) {
+// //         response.on("data", function (data) {
+// //             console.log(JSON.parse(data));
+// //         })
+// //     })
+// //     request.write(jsonData);//parsing the JSON Data to the mailchimp server 
+// //     request.end();
+
+
+//  })
+
+
+// app.listen(3000, function () {
+//     console.log("UPPPP");
+// });
+
+
+
+
+
+
+
+
+
+
+// // api key is generated through mailchimp
+// // c93cc1320388406941504ca9450d080c-us21
+
+// // List ID
+// // 06395cf51a
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const express = require("express");
+
+const bodyParser = require("body-parser");
+
+const https = require("https");
+
+const app = express();
+
+
+
+
+
+app.use(express.static("public"));
+
+app.use(bodyParser.urlencoded({
+
+    extended: true
+
+}));
+
+
+
+
+
+app.get("/", function (req, res) {
+
+    res.sendFile(__dirname + "/signup.html")
+
+})
+
+app.post("/", function (req, res) {
+
+    const firstName = req.body.Fname;
+
+    const lastName = req.body.Lname;
+
+    const email = req.body.Email;
+
+    const data = {
+
+        members: [{
+
+            email_address: email,
+
+            status: "subscribed",
+
+            merge_fields: {
+
+                FNAME: firstName,
+
+                LNAME: lastName,
+
+            }
+
+
+
+        }]
+
+    }
+
+    const jsonData = JSON.stringify(data);
+
+    const url = "https://us21.api.mailchimp.com/3.0/lists/06395cf51a";
+    const options = {
+
+        method: "POST",
+
+        auth: "abhi-coder722:c110dd5ae2617f1a08b596da92c0946d-us21"//random name:api key
+
+    };
+
+    const request = https.request(url, options, function (response) {
+
+        if (response.statusCode === 200) {
+            res.sendFile(__dirname + "/success.html")
+        } else {
+            res.sendFile(__dirname + "/failure.html")
+        }
+
+        response.on("data", function (data) {
+
+            console.log(JSON.parse(data));
+
+        })
+
+    })
+
+    request.write(jsonData);
+
+    request.end();
+
+
+
+
+
+
+
+})
+
+
+
+app.post("/failure", function (req, res) {//taking the user back to the home route whenever there is a failure error 
+    res.redirect("/");
+})
+
+
+
+
+app.listen(process.env.PORT || 5000, function () {//here insted off porting to the local host we need to port to the heroku serever and they provide their own server so here we will use  but we use or command ||
+
+    console.log("Server is running on port 3000");
+
+})
